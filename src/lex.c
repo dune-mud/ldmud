@@ -874,9 +874,9 @@ init_lexer(void)
     add_permanent_define("__INT_MAX__", -1, string_copy(mtext), MY_FALSE);
     sprintf(mtext, "(%"PRIdPINT")", PINT_MIN);
     add_permanent_define("__INT_MIN__", -1, string_copy(mtext), MY_FALSE);
-    sprintf(mtext, "(%g)", DBL_MAX);
+    sprintf(mtext, "(%.17g)", DBL_MAX);
     add_permanent_define("__FLOAT_MAX__", -1, string_copy(mtext), MY_FALSE);
-    sprintf(mtext, "(%g)", DBL_MIN);
+    sprintf(mtext, "(%.17g)", DBL_MIN);
     add_permanent_define("__FLOAT_MIN__", -1, string_copy(mtext), MY_FALSE);
     sprintf(mtext, "%"PRIdMPINT, get_current_time());
     add_permanent_define("__BOOT_TIME__", -1, string_copy(mtext), MY_FALSE);
