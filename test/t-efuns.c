@@ -5,6 +5,7 @@
 #include "/sys/tls.h"
 #include "/sys/configuration.h"
 #include "/sys/lpctypes.h"
+#include "/sys/object_info.h"
 #include "/sys/regexp.h"
 
 #define TESTFILE "/log/testfile"
@@ -27,6 +28,8 @@ string dhe_testdata =
   "gSJfIqbdAdQr7v25rrFowz/ClEMRH0IXM10h8shzr3Cx4e552Z2saV9SRPOgrlcD\n"
   "VxyEwepMIUNDCOCPNP2nwwBXav10bGmZ0wIBBQ==\n"
   "-----END DH PARAMETERS-----\n";
+
+mixed global_var;
 
 int f(int arg);
 
@@ -136,7 +139,12 @@ mixed *tests = ({
      * can't be a part of the regular test array. But they
      * should not crash and should not leak any memory.
      */
-    ({ "allocate 6a", TF_ERROR, (: allocate(0x1000000, ({ 1 })) :) }),
+    ({ "allocate 6a", TF_ERROR,
+        (:
+            configure_driver(DC_MEMORY_LIMIT, ({ 0x10000000, 0x20000000 }));
+            allocate(0x1000000, ({ 1 }));
+         :)
+    }),
     ({ "allocate 6b", TF_ERROR, (: allocate( ({0x100, 0x100, 0x100}), ({ 1 })); :) }),
 #endif
     ({ "asin 1", 0,        (: asin(0.0) == 0 :) }),
@@ -257,6 +265,26 @@ mixed *tests = ({
     ({ "map mapping 4", 0, (: deep_eq(map(([1,2,3]), (: $1 + $3 :), 1), ([1:2,2:3,3:4])) :) }),
     ({ "map mapping 5", 0, (: deep_eq(map(([1,2,3]), "f"), ([1:2,2:3,3:4])) :) }),
     ({ "map mapping 6", TF_ERROR, (: map(([]), unbound_lambda(0,0), ([1,2,3])) :) }),
+
+    ({ "lambda with many values", 0,
+      (:
+          mixed *prog = ({ #', });
+          foreach(int i: 65535)
+              prog += ({ sprintf("%04x", i) });
+          closure cl = lambda(0, prog);
+
+          /* This shouldn't crash. */
+          global_var = cl;
+          object_info(this_object(), OI_DATA_SIZE);
+
+          return funcall(cl) == "fffe";
+      :)
+    }),
+
+    ({ "load_object 1", 0, (: load_object(__FILE__) == this_object() :) }),
+    ({ "load_object 2", 0, (: load_object("/" __FILE__) == this_object() :) }),
+    ({ "load_object 3", 0, (: load_object("./" __FILE__) == this_object() :) }),
+    ({ "load_object 4", 0, (: load_object("/./" __FILE__) == this_object() :) }),
 
     ({ "regmatch 1", 0, (: regmatch("abcd", "abc") == "abc" :) }),
     ({ "regmatch 2", 0, (: regmatch("abcd", "abcdef") == 0 :) }),
@@ -399,6 +427,18 @@ mixed *tests = ({
            return deep_eq(a, b) && deep_eq(a, ({0,1,2,3,4,5,6}) );
         :)
     }),
+<<<<<<< HEAD
+=======
+
+    ({ "variable_list 1", 0, (: deep_eq(variable_list(this_object()),                        ({ "last_rt_warning",            "json_testdata", "json_teststring", "b",              "dhe_testdata", "global_var", "clone",     "tests"                   })) :) }),
+    ({ "variable_list 2", 0, (: deep_eq(map(variable_list(this_object(), RETURN_FUNCTION_FLAGS), #'&, NAME_INHERITED|TYPE_MOD_NOSAVE|TYPE_MOD_PRIVATE|TYPE_MOD_PROTECTED|TYPE_MOD_VIRTUAL|TYPE_MOD_NO_MASK|TYPE_MOD_PUBLIC),
+                                                                                             ({ 0,                            0,               0,                 TYPE_MOD_NO_MASK, 0,              0,            0,           0                         })) :) }),
+    ({ "variable_list 3", 0, (: deep_eq(variable_list(this_object(), RETURN_FUNCTION_TYPE),  ({ TYPE_MOD_POINTER|TYPE_STRING, TYPE_MAPPING,    TYPE_STRING,       TYPE_BYTES,       TYPE_STRING,    TYPE_ANY,     TYPE_OBJECT, TYPE_MOD_POINTER|TYPE_ANY })) :) }),
+    ({ "variable_list 4", 0, (: deep_eq(variable_list(this_object(), RETURN_FUNCTION_NAME | RETURN_FUNCTION_TYPE), 
+                                ({ "last_rt_warning", TYPE_MOD_POINTER|TYPE_STRING, "json_testdata", TYPE_MAPPING, "json_teststring", TYPE_STRING, "b", TYPE_BYTES, "dhe_testdata", TYPE_STRING, "global_var", TYPE_ANY, "clone", TYPE_OBJECT, "tests", TYPE_MOD_POINTER|TYPE_ANY })) :) }),
+    ({ "variable_list 5", 0, (: variable_list(this_object(), RETURN_VARIABLE_VALUE)[3] == b"\x00" :) }),
+
+>>>>>>> c73532a7 (Remove lambda closure value gap at 0xff)
 #ifdef __JSON__
     ({ "json_parse/_serialize 1", 0,
         (: json_parse(json_serialize(1) ) == 1:) }),
@@ -495,7 +535,20 @@ void run_test()
 
 string *epilog(int eflag)
 {
+<<<<<<< HEAD
     configure_driver(DC_MEMORY_LIMIT, ({ 0x10000000, 0x20000000 }));
+=======
+    set_driver_hook(H_DEFAULT_METHOD, function int(mixed result, object ob, string fun, varargs mixed* args)
+    {
+        if (fun == "g")
+        {
+            result = ob->f(args...) + 1;
+            return 1;
+        }
+
+        return 0;
+    });
+>>>>>>> c73532a7 (Remove lambda closure value gap at 0xff)
 
     run_test();
     return 0;
