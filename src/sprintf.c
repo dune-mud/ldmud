@@ -2256,7 +2256,9 @@ add_table_now:
                        */
                     double value;   /* The value to print */
                     int    numdig;  /* (Estimated) number of digits before the '.' */
+#ifndef USE_NULLSAFE_SPRINTF
                     Bool zeroCharHack = MY_FALSE;
+#endif
                     char *p = cheat; /* pointer to the format buffer */
                     int tmpl;
 
@@ -2311,8 +2313,12 @@ add_table_now:
                         if (format_char == 'c') {
                             if (carg->u.number == 0)
                             {
+#ifdef USE_NULLSAFE_SPRINTF
+                            format_char = 's';
+#else
                             carg->u.number = 1;
                             zeroCharHack = MY_TRUE;
+#endif
                             }
                         }
                         /* insert the correct length modifier for a p_int
@@ -2325,13 +2331,18 @@ add_table_now:
                         }
                         *(p++) = format_char;
                         *p = '\0';
-                        sprintf(temp, cheat, carg->u.number);
+                        if (format_char == 's') {
+                          sprintf(temp, cheat, "");
+                        } else {
+                          sprintf(temp, cheat, carg->u.number);
+                        }
                         tmpl = strlen(temp);
                         if ((size_t)tmpl >= sizeof(temp))
                             fatal("Local buffer overflow in sprintf() for int.\n");
                         if (pres && tmpl > pres)
                             tmpl = pres; /* well.... */
 
+#ifndef USE_NULLSAFE_SPRINTF
                         if (zeroCharHack)
                         {
                             int pos;
@@ -2341,6 +2352,7 @@ add_table_now:
                                     temp[pos] = 0x00;
                             }
                         }
+#endif
                     }
                     if ((unsigned int)tmpl < fs)
                     {
