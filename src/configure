@@ -709,6 +709,7 @@ cdef_use_gcrypt
 cdef_use_tls
 cdef_use_structs
 cdef_use_deprecated
+cdef_use_nullsafe_sprintf
 cdef_use_builtin_pcre
 cdef_use_pcre
 cdef_use_mccp
@@ -820,6 +821,7 @@ enable_use_pcre
 enable_use_xml
 with_xml_path
 enable_use_deprecated
+enable_use_nullsafe_sprintf
 enable_use_structs
 enable_use_tls
 with_tls_path
@@ -1581,6 +1583,8 @@ Optional Features:
         Enables XML support: no/xml2/iksemel/yes
   --enable-use-deprecated  default=enabled
         Enables obsolete and deprecated efuns
+  --enable-use-nullsafe-sprintf default=disabled
+        Enables legacy %c == \0 handling in (s)printf
   --enable-use-structs  default=enabled
         Enables structs
   --enable-use-tls  default=disabled
@@ -3076,6 +3080,13 @@ if test "${enable_use_deprecated+set}" = set; then :
 fi
 
 
+DEFAULTenable_use_nullsafe_sprintf=no
+# Check whether --enable-use-nullsafe-sprintf was given.
+if test "${enable_use_nullsafe_sprintf+set}" = set; then :
+  enableval=$enable_use_nullsafe_sprintf;
+fi
+
+
 DEFAULTenable_use_structs=yes
 # Check whether --enable-use-structs was given.
 if test "${enable_use_structs+set}" = set; then :
@@ -4116,6 +4127,16 @@ if test "x$enable_use_deprecated" = "xyes"; then
   cdef_use_deprecated="#define"
 else
   cdef_use_deprecated="#undef"
+fi
+
+if test "x$enable_use_nullsafe_sprintf" = "x" && test "x$DEFAULTenable_use_nullsafe_sprintf" != "x"; then
+  enable_use_nullsafe_sprintf=$DEFAULTenable_use_nullsafe_sprintf
+fi
+
+if test "x$enable_use_nullsafe_sprintf" = "xyes"; then
+  cdef_use_nullsafe_sprintf="#define"
+else
+  cdef_use_nullsafe_sprintf="#undef"
 fi
 
 if test "x$enable_use_structs" = "x" && test "x$DEFAULTenable_use_structs" != "x"; then
