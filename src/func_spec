@@ -685,6 +685,10 @@ string  process_string(string);
 
         /* Obsolete and deprecated functions */
 
+#ifdef USE_SET_LIGHT
+int     set_light(int);
+#endif
+
 #ifdef USE_DEPRECATED
 
         /* Functions only used in compatibility mode.
