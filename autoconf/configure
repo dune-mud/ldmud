@@ -732,6 +732,7 @@ cdef_use_parse_command
 cdef_use_gcrypt
 cdef_use_tls
 cdef_use_deprecated
+cdef_use_set_light
 cdef_use_pcre
 cdef_use_mccp
 cdef_use_xml
@@ -851,6 +852,7 @@ enable_use_pcre
 enable_use_xml
 with_xml_path
 enable_use_deprecated
+enable_use_set_light
 enable_use_tls
 with_tls_path
 with_tls_keyfile
@@ -1628,6 +1630,8 @@ Optional Features:
         Enables XML support: no/xml2/iksemel/yes
   --enable-use-deprecated  default=enabled
         Enables obsolete and deprecated efuns
+  --enable-use-set-light default=disabled
+	Enables obselte light handling efun
   --enable-use-tls  default=disabled
         Enables Transport Layer Security over Telnet: no/gnu/ssl/yes
   --enable-use-gcrypt  default=enabled
@@ -3149,13 +3153,17 @@ if test "${enable_use_deprecated+set}" = set; then :
   enableval=$enable_use_deprecated;
 fi
 
+DEFAULTenable_use_set_light=no
+# Check whether --enable-use-set-light was given.
+if test "${enable_use_set_light+set}" = set; then :
+  enableval=$enable_use_set_light;
+fi
 
 DEFAULTenable_use_tls=no
 # Check whether --enable-use-tls was given.
 if test "${enable_use_tls+set}" = set; then :
   enableval=$enable_use_tls;
 fi
-
 
 DEFAULTwith_tls_path=
 
@@ -4203,6 +4211,16 @@ if test "x$enable_use_deprecated" = "xyes"; then
   cdef_use_deprecated="#define"
 else
   cdef_use_deprecated="#undef"
+fi
+
+if test "x$enable_use_set_light" = "x" && test "x$DEFAULTenable_use_set_light" != "x"; then
+  enable_use_set_light=$DEFAULTenable_use_set_light
+fi
+
+if test "x$enable_use_set_light" = "xyes"; then
+  cdef_use_set_light="#define"
+else
+  cdef_use_set_light="#undef"
 fi
 
 if test "x$enable_use_parse_command" = "x" && test "x$DEFAULTenable_use_parse_command" != "x"; then
