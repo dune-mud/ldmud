@@ -694,7 +694,7 @@ int     set_light(int);
         /* Functions only used in compatibility mode.
          */
 
-int     transfer(object, object|string) "replace by a simul-efun";
+int     transfer(object, object|string);
 
 #endif /* USE_DEPRECATED */
 
