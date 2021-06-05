@@ -392,6 +392,10 @@
  */
 @cdef_use_deprecated@ USE_DEPRECATED
 
+/* Define this if you want the legacy %c == \0 handling in 
+ * (s)printf efuns.
+ */
+@cdef_use_nullsafe_sprintf@ USE_NULLSAFE_SPRINTF
 
 /* --- Runtime limits --- */
 
