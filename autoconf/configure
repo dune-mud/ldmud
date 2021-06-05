@@ -733,6 +733,7 @@ cdef_use_gcrypt
 cdef_use_tls
 cdef_use_deprecated
 cdef_use_set_light
+cdef_use_nullsafe_sprintf
 cdef_use_pcre
 cdef_use_mccp
 cdef_use_xml
@@ -853,6 +854,7 @@ enable_use_xml
 with_xml_path
 enable_use_deprecated
 enable_use_set_light
+enable_use_nullsafe_sprintf
 enable_use_tls
 with_tls_path
 with_tls_keyfile
@@ -1631,7 +1633,9 @@ Optional Features:
   --enable-use-deprecated  default=enabled
         Enables obsolete and deprecated efuns
   --enable-use-set-light default=disabled
-	Enables obselte light handling efun
+        Enables obsolete light handling efun
+  --enable-use-nullsafe-sprintf default=disabled
+        Enables obsolete null char handling in (s)printf efuns
   --enable-use-tls  default=disabled
         Enables Transport Layer Security over Telnet: no/gnu/ssl/yes
   --enable-use-gcrypt  default=enabled
@@ -3159,6 +3163,12 @@ if test "${enable_use_set_light+set}" = set; then :
   enableval=$enable_use_set_light;
 fi
 
+DEFAULTenable_nullsafe_sprintf=no
+# Check whether --enable-nullsafe-sprintf was given.
+if test "${enable_use_nullsafe_sprintf+set}" = set; then :
+  enableval=$enable_use_nullsafe_sprintf;
+fi
+
 DEFAULTenable_use_tls=no
 # Check whether --enable-use-tls was given.
 if test "${enable_use_tls+set}" = set; then :
@@ -4221,6 +4231,16 @@ if test "x$enable_use_set_light" = "xyes"; then
   cdef_use_set_light="#define"
 else
   cdef_use_set_light="#undef"
+fi
+
+if test "x$enable_use_nullsafe_sprintf" = "x" && test "x$DEFAULTenable_use_nullsafe_sprintf" != "x"; then
+  enable_use_nullsafe_sprintf=$DEFAULTenable_use_nullsafe_sprintf
+fi
+
+if test "x$enable_use_nullsafe_sprintf" = "xyes"; then
+  cdef_use_nullsafe_sprintf="#define"
+else
+  cdef_use_nullsafe_sprintf="#undef"
 fi
 
 if test "x$enable_use_parse_command" = "x" && test "x$DEFAULTenable_use_parse_command" != "x"; then
