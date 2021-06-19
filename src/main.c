@@ -1940,10 +1940,6 @@ options (void)
 #ifdef USE_DEPRECATED
                               , "obsolete and deprecated efuns enabled\n"
 #endif
-#ifdef USE_NULLSAFE_SPRINTF
-                              , "legacy null char handling in (s)printf efuns "
-                                "enabled\n"
-#endif
 #ifdef NO_NEGATIVE_RANGES
                               , "assignments to negative ranges disabled\n"
 #endif
