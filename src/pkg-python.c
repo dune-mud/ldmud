@@ -4968,7 +4968,24 @@ call_python_efun (int idx, int num_arg)
     inter_sp = pop_n_elems(num_arg, inter_sp);
 
     python_is_external = false;
-    python_save_context();
+    /*
+     * When we're calling python_reload() don't save the current context.
+     * Doing so seems to jam the wrong object into the `ldmud.current_object
+     * python_contextvar_current_object` var. Later, when processing an external
+     * call we will unconditionally restore this jammed object instead of using
+     * master, causing all sorts of problems depending on what `this_object()`
+     * was when `python_reload()` was called.
+     *
+     * I suspect this isn't the "right" fix, but it does fix the symptoms I'm
+     * seeing after reloading Python code from in-game. Let's ship it to our
+     * dev instance while we make a repro to share with the LD MUD devs to find
+     * a better long-term fix.
+     *   - Paradox@DUNE 2021-08-07
+     */
+    if(strcmp(python_efun_names[idx]->name->txt, "python_reload") != 0)
+    {
+        python_save_context();
+    }
     result = PyObject_CallObject(python_efun_table[idx], args);
     python_is_external = was_external;
     Py_XDECREF(args);
