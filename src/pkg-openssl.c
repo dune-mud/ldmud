@@ -817,7 +817,13 @@ tls_global_init (void)
 
     // Register pointers to our own allocator functions before calling any
     // other function from OpenSSL.
-    CRYPTO_set_mem_functions(openssl_malloc, openssl_realloc, openssl_free);
+    //
+    // NB: Disabled to avoid stack/heap overlap crash when a Python thread
+    //     uses OpenSSL. This is a mild hack until the source of the second
+    //     thread is identified.
+    //     See http://mantis.ldmud.eu/mantis/view.php?id=905
+    //
+    //CRYPTO_set_mem_functions(openssl_malloc, openssl_realloc, openssl_free);
 
     SSL_load_error_strings();
     ERR_load_BIO_strings();
