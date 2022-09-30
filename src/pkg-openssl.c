@@ -265,6 +265,7 @@ no_passphrase_callback (char * buf, int num, int w, void *arg)
     return -1;
 } /* no_passphrase_callback() */
 
+#if defined(ALLOCATOR_WRAPPERS)
 static void *
 openssl_malloc (size_t size, const char* file, int line)
 /*
@@ -295,6 +296,7 @@ openssl_realloc (void * ptr, size_t size, const char* file, int line)
 {
     return prexalloc(ptr, size);
 }
+#endif /* ALLOCATOR_WRAPPERS */
 
 /*-------------------------------------------------------------------------*/
 static int
@@ -834,9 +836,11 @@ tls_global_init (void)
     debug_message("%s TLS: (OpenSSL) Keyfile '%s', Certfile '%s'\n"
                  , time_stamp(), tls_keyfile, tls_certfile);
 
+#if defined(ALLOCATOR_WRAPPERS)
     // Register pointers to our own allocator functions before calling any
     // other function from OpenSSL.
     CRYPTO_set_mem_functions(openssl_malloc, openssl_realloc, openssl_free);
+#endif /* ALLOCATOR_WRAPPERS */
 
     SSL_load_error_strings();
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
